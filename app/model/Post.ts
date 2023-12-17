@@ -1,8 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface Post extends Document {
+export interface Post extends Document {
   title: string;
   description: string;
+  organizationId: string;
+  userId: string;
+  user?: {
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: Date;
 }
 
 const PostSchema: Schema<Post> = new mongoose.Schema({
@@ -18,10 +25,23 @@ const PostSchema: Schema<Post> = new mongoose.Schema({
     required: true,
     maxlength: [200, "Description cannot be more than 200 characters"],
   },
+  organizationId: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
 });
 
-const Post =
+const PostModel =
   (mongoose.models.Post as mongoose.Model<Post>) ||
   mongoose.model<Post>("Post", PostSchema);
 
-export default Post;
+export default PostModel;

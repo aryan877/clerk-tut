@@ -1,6 +1,6 @@
 "use client";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { AppShell, Box, Burger, Group, Text } from "@mantine/core";
+import { AppShell, Box, Burger, Group, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Navbar from "@/components/Navbar";
 import Posts from "@/components/Posts";
@@ -27,7 +27,7 @@ export default function HomePage({ children }: { children: React.ReactNode }) {
               hiddenFrom="sm"
               size="sm"
             />
-            <Text>LCO</Text>
+            <Title order={4}>LCO</Title>
             <OrganizationSwitcher
               afterSelectOrganizationUrl="/"
               afterSelectPersonalUrl="/"

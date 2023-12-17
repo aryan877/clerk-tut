@@ -1,6 +1,6 @@
 import { Post } from "@/model/Post";
 import { useOrganization } from "@clerk/nextjs";
-import { Box, Button, Card, List, TextInput, Title } from "@mantine/core";
+import { Box, Button, Card, List, TextInput, Title, Loader } from "@mantine/core";
 import axios from "axios";
 import dayjs from "dayjs";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -9,26 +9,29 @@ function Posts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState({ title: "", description: "" });
   const [isPosting, setIsPosting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); 
   const { organization } = useOrganization();
 
-useEffect(() => {
-  const fetchPosts = async () => {
-    try {
-      if (!organization?.id) {
-        // Organization ID is not available, skip fetching posts
-        return;
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        if (!organization?.id) {
+          // Organization ID is not available, skip fetching posts
+          return;
+        }
+
+        const response = await axios.get("/api/posts");
+        setPosts(response.data.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        // Set loading state to false when the data is fetched
+        setIsLoading(false);
       }
+    };
 
-      const response = await axios.get("/api/posts");
-      setPosts(response.data.data);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    }
-  };
-
-  fetchPosts();
-}, [organization?.id]);
-
+    fetchPosts();
+  }, [organization?.id]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,18 +91,22 @@ useEffect(() => {
         </Button>
       </Card>
 
-      <List spacing="md">
-        {posts.map((post) => (
-          <Card key={post._id} p="md" radius="md" mt="md">
-            <Title order={2}>{post.title}</Title>
-            <p>{post.description}</p>
-            <p>
-              Posted by {post?.user?.firstName} {post?.user?.lastName} on{" "}
-              {dayjs(post.createdAt).format("MMMM D, YYYY [at] h:mm A")}
-            </p>
-          </Card>
-        ))}
-      </List>
+      {isLoading ? (
+        <Loader size="md" />
+      ) : (
+        <List spacing="md">
+          {posts.map((post) => (
+            <Card key={post._id} p="md" radius="md" mt="md">
+              <Title order={2}>{post.title}</Title>
+              <p>{post.description}</p>
+              <p>
+                Posted by {post?.user?.firstName} {post?.user?.lastName} on{" "}
+                {dayjs(post.createdAt).format("MMMM D, YYYY [at] h:mm A")}
+              </p>
+            </Card>
+          ))}
+        </List>
+      )}
     </Box>
   );
 }

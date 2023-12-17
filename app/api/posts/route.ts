@@ -16,8 +16,10 @@ export async function GET(request: Request) {
   console.log(userId, orgId);
 
   try {
-    // Fetch posts that belong to the specific organization
-    const posts = await Post.find({ organizationId: orgId });
+    // Fetch posts that belong to the specific organization and sort by creation date in descending order
+    const posts = await Post.find({ organizationId: orgId })
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .exec();
 
     // Fetch user information for each post
     const postsWithUserInfo = await Promise.all(
@@ -44,6 +46,7 @@ export async function GET(request: Request) {
     return Response.json({ success: false }, { status: 400 });
   }
 }
+
 
 /**
  * Handle POST requests to /api

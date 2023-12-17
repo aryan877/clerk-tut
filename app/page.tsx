@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Navbar from "@/components/Navbar";
 import Posts from "@/components/Posts";
 
-export default function HomePage({ children }: { children: React.ReactNode }) {
+export default function HomePage() {
   const [opened, { toggle }] = useDisclosure();
 
   return (

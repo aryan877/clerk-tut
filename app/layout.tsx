@@ -1,5 +1,7 @@
 import "@mantine/core/styles.css";
+import { ClerkLoaded, ClerkProvider } from "@clerk/nextjs";
 import React from "react";
+import { dark } from "@clerk/themes";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { theme } from "../theme";
 
@@ -20,7 +22,17 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-        <MantineProvider defaultColorScheme='dark' theme={theme}>{children}</MantineProvider>
+        <ClerkProvider
+          appearance={{
+            baseTheme: dark,
+          }}
+        >
+          <ClerkLoaded>
+            <MantineProvider defaultColorScheme="dark" theme={theme}>
+              {children}
+            </MantineProvider>
+          </ClerkLoaded>
+        </ClerkProvider>
       </body>
     </html>
   );

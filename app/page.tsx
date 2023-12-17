@@ -1,7 +1,9 @@
-'use client';
-import { AppShell, Box, Burger, Group, Text } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import LoginButton from '@/components/LoginButton';
+"use client";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { AppShell, Box, Burger, Group, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import Navbar from "@/components/Navbar";
+import Posts from "@/components/Posts";
 
 export default function HomePage({ children }: { children: React.ReactNode }) {
   const [opened, { toggle }] = useDisclosure();
@@ -11,14 +13,14 @@ export default function HomePage({ children }: { children: React.ReactNode }) {
       header={{ height: 60 }}
       navbar={{
         width: 300,
-        breakpoint: 'sm',
+        breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}
       padding="md"
     >
       <AppShell.Header p="md">
-        <Group justify='space-between'>
-          <Box>
+        <Group justify="space-between">
+          <Group>
             <Burger
               opened={opened}
               onClick={toggle}
@@ -26,16 +28,22 @@ export default function HomePage({ children }: { children: React.ReactNode }) {
               size="sm"
             />
             <Text>LCO</Text>
-          </Box>
-          <LoginButton />
+            <OrganizationSwitcher
+              afterSelectOrganizationUrl="/"
+              afterSelectPersonalUrl="/"
+            />
+          </Group>
+          <UserButton afterSignOutUrl="/sign-in" />
         </Group>
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        <Text>Navbar</Text>
+        <Navbar/>
       </AppShell.Navbar>
 
-      <AppShell.Main>Main</AppShell.Main>
+      <AppShell.Main>
+        <Posts/>
+      </AppShell.Main>
     </AppShell>
   );
 }

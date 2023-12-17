@@ -57,9 +57,10 @@ useEffect(() => {
   return (
     <Box p="md">
       <Title order={1} mb="md">
-        Posts from {organization?.name}
+        {organization?.id
+          ? `Posts from ${organization.name}`
+          : "Choose Organization"}
       </Title>
-
       <Card shadow="sm" padding="md" radius="md">
         <TextInput
           placeholder="Title"

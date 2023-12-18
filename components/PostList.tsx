@@ -10,6 +10,7 @@ import {
   Title,
   Loader,
   SimpleGrid,
+  Text,
 } from "@mantine/core";
 import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -80,7 +81,7 @@ function PostListComponent() {
     <Box p="md">
       {organization?.id ? (
         <>
-          <Title order={1} mb="md">
+          <Title order={2} mb="md">
             Posts from {organization.name}
           </Title>
           <Card shadow="sm" padding="md" radius="md">
@@ -113,27 +114,34 @@ function PostListComponent() {
           {isLoading ? (
             <Loader size="md" my="md" />
           ) : (
-            <List spacing="md">
-              {posts.length === 0 ? (
-                <p>No posts yet.</p>
-              ) : (
-                <SimpleGrid cols={3}>
-                  {posts.map((post) => (
-                    <PostComponent
-                      key={post._id}
-                      post={post}
-                      onDelete={() => handleDelete(post._id)}
-                      userId={userId}
-                    />
-                  ))}
-                </SimpleGrid>
-              )}
-            </List>
+            <Box my="md">
+              <List spacing="md">
+                {posts.length === 0 ? (
+                  <p>No posts yet.</p>
+                ) : (
+                  <>
+                    <Text>All Posts ({posts.length})</Text>
+                    <SimpleGrid cols={3}>
+                      {posts.map((post) => (
+                        <PostComponent
+                          key={post._id}
+                          post={post}
+                          onDelete={() => handleDelete(post._id)}
+                          userId={userId}
+                        />
+                      ))}
+                    </SimpleGrid>
+                  </>
+                )}
+              </List>
+            </Box>
           )}
         </>
       ) : (
-        <Box ta='center' mt="5">
-          <Title order={1}>Switch to an organization to create or view posts</Title>
+        <Box ta="center" mt="5">
+          <Title order={1}>
+            Switch to an organization to create or view posts
+          </Title>
           {/* <Button onClick={() => switchOrganization()}>
             Switch Organization
           </Button> */}

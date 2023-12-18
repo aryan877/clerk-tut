@@ -9,6 +9,7 @@ import {
   TextInput,
   Title,
   Loader,
+  SimpleGrid,
 } from "@mantine/core";
 import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -114,14 +115,16 @@ function PostListComponent() {
           {posts.length === 0 ? (
             <p>No posts yet.</p>
           ) : (
-            posts.map((post) => (
-              <PostComponent
-                key={post._id}
-                post={post}
-                onDelete={() => handleDelete(post._id)}
-                userId={userId}
-              />
-            ))
+            <SimpleGrid cols={3}>
+              {posts.map((post) => (
+                <PostComponent
+                  key={post._id}
+                  post={post}
+                  onDelete={() => handleDelete(post._id)}
+                  userId={userId}
+                />
+              ))}
+            </SimpleGrid>
           )}
         </List>
       )}

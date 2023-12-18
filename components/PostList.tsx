@@ -20,19 +20,21 @@ function PostListComponent() {
   const [newPost, setNewPost] = useState({ title: "", description: "" });
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { organization } = useOrganization();
+  const { organization } = useOrganization(); // Added switchOrganization
   const { user } = useUser();
   const userId = user?.id;
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("/api/posts");
-        setPosts(response.data.data);
+        // Fetch posts only if the organization ID is present
+        if (organization?.id) {
+          const response = await axios.get("/api/posts");
+          setPosts(response.data.data);
+        }
       } catch (error) {
         console.error("Error fetching posts:", error);
       } finally {
-        // Set loading state to false when the data is fetched
         setIsLoading(false);
       }
     };
@@ -47,11 +49,11 @@ function PostListComponent() {
 
   const handleDelete = async (postId: string) => {
     try {
-      // Send a DELETE request to the API endpoint with the postId
-      await axios.delete(`/api/delete_post?postid=${postId}`);
-      // Fetch the updated list of posts after deleting
-      const response = await axios.get("/api/posts");
-      setPosts(response.data.data);
+      if (organization?.id) {
+        await axios.delete(`/api/delete_post?postid=${postId}`);
+        const response = await axios.get("/api/posts");
+        setPosts(response.data.data);
+      }
     } catch (error) {
       console.error("Error deleting post:", error);
     }
@@ -61,14 +63,12 @@ function PostListComponent() {
     try {
       setIsPosting(true);
 
-      await axios.post("/api/posts", newPost);
-
-      // Fetch the updated list of posts after posting
-      const response = await axios.get("/api/posts");
-      setPosts(response.data.data);
-
-      // Clear the input fields
-      setNewPost({ title: "", description: "" });
+      if (organization?.id) {
+        await axios.post("/api/posts", newPost);
+        const response = await axios.get("/api/posts");
+        setPosts(response.data.data);
+        setNewPost({ title: "", description: "" });
+      }
     } catch (error) {
       console.error("Error posting new post:", error);
     } finally {
@@ -78,55 +78,66 @@ function PostListComponent() {
 
   return (
     <Box p="md">
-      <Title order={1} mb="md">
-        {organization?.id ? `Posts from ${organization.name}` : "Personal Wall"}
-      </Title>
-      <Card shadow="sm" padding="md" radius="md">
-        <TextInput
-          placeholder="Title"
-          label="Title"
-          value={newPost.title}
-          onChange={handleInputChange}
-          name="title"
-          required
-          maxLength={40}
-        />
+      {organization?.id ? (
+        <>
+          <Title order={1} mb="md">
+            Posts from {organization.name}
+          </Title>
+          <Card shadow="sm" padding="md" radius="md">
+            <TextInput
+              placeholder="Title"
+              label="Title"
+              value={newPost.title}
+              onChange={handleInputChange}
+              name="title"
+              required
+              maxLength={40}
+            />
 
-        <TextInput
-          mt="md"
-          placeholder="Description"
-          label="Description"
-          value={newPost.description}
-          onChange={handleInputChange}
-          name="description"
-          required
-          maxLength={200}
-        />
+            <TextInput
+              mt="md"
+              placeholder="Description"
+              label="Description"
+              value={newPost.description}
+              onChange={handleInputChange}
+              name="description"
+              required
+              maxLength={200}
+            />
 
-        <Button onClick={handlePost} mt="md" loading={isPosting}>
-          {isPosting ? "Posting..." : "Post"}
-        </Button>
-      </Card>
+            <Button onClick={handlePost} mt="md" loading={isPosting}>
+              {isPosting ? "Posting..." : "Post"}
+            </Button>
+          </Card>
 
-      {isLoading ? (
-        <Loader size="md" my="md" />
-      ) : (
-        <List spacing="md">
-          {posts.length === 0 ? (
-            <p>No posts yet.</p>
+          {isLoading ? (
+            <Loader size="md" my="md" />
           ) : (
-            <SimpleGrid cols={3}>
-              {posts.map((post) => (
-                <PostComponent
-                  key={post._id}
-                  post={post}
-                  onDelete={() => handleDelete(post._id)}
-                  userId={userId}
-                />
-              ))}
-            </SimpleGrid>
+            <List spacing="md">
+              {posts.length === 0 ? (
+                <p>No posts yet.</p>
+              ) : (
+                <SimpleGrid cols={3}>
+                  {posts.map((post) => (
+                    <PostComponent
+                      key={post._id}
+                      post={post}
+                      onDelete={() => handleDelete(post._id)}
+                      userId={userId}
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+            </List>
           )}
-        </List>
+        </>
+      ) : (
+        <Box ta='center' mt="5">
+          <Title order={1}>Switch to an organization to create or view posts</Title>
+          {/* <Button onClick={() => switchOrganization()}>
+            Switch Organization
+          </Button> */}
+        </Box>
       )}
     </Box>
   );

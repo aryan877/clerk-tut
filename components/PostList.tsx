@@ -1,25 +1,31 @@
+// PostList.tsx
 import { Post } from "@/model/Post";
-import { useOrganization } from "@clerk/nextjs";
-import { Box, Button, Card, List, TextInput, Title, Loader } from "@mantine/core";
+import { useOrganization, useUser } from "@clerk/nextjs";
+import {
+  Box,
+  Button,
+  Card,
+  List,
+  TextInput,
+  Title,
+  Loader,
+} from "@mantine/core";
 import axios from "axios";
-import dayjs from "dayjs";
 import React, { ChangeEvent, useEffect, useState } from "react";
+import PostComponent from "@/components/Post";
 
-function Posts() {
+function PostListComponent() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState({ title: "", description: "" });
   const [isPosting, setIsPosting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
   const { organization } = useOrganization();
+  const { user } = useUser();
+  const userId = user?.id;
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        if (!organization?.id) {
-          // Organization ID is not available, skip fetching posts
-          return;
-        }
-
         const response = await axios.get("/api/posts");
         setPosts(response.data.data);
       } catch (error) {
@@ -36,6 +42,18 @@ function Posts() {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewPost((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDelete = async (postId: string) => {
+    try {
+      // Send a DELETE request to the API endpoint with the postId
+      await axios.delete(`/api/delete_post?postid=${postId}`);
+      // Fetch the updated list of posts after deleting
+      const response = await axios.get("/api/posts");
+      setPosts(response.data.data);
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
   };
 
   const handlePost = async () => {
@@ -60,9 +78,7 @@ function Posts() {
   return (
     <Box p="md">
       <Title order={1} mb="md">
-        {organization?.id
-          ? `Posts from ${organization.name}`
-          : "Choose Organization"}
+        {organization?.id ? `Posts from ${organization.name}` : "Personal Wall"}
       </Title>
       <Card shadow="sm" padding="md" radius="md">
         <TextInput
@@ -92,23 +108,25 @@ function Posts() {
       </Card>
 
       {isLoading ? (
-        <Loader size="md" />
+        <Loader size="md" my="md" />
       ) : (
         <List spacing="md">
-          {posts.map((post) => (
-            <Card key={post._id} p="md" radius="md" mt="md">
-              <Title order={2}>{post.title}</Title>
-              <p>{post.description}</p>
-              <p>
-                Posted by {post?.user?.firstName} {post?.user?.lastName} on{" "}
-                {dayjs(post.createdAt).format("MMMM D, YYYY [at] h:mm A")}
-              </p>
-            </Card>
-          ))}
+          {posts.length === 0 ? (
+            <p>No posts yet.</p>
+          ) : (
+            posts.map((post) => (
+              <PostComponent
+                key={post._id}
+                post={post}
+                onDelete={() => handleDelete(post._id)}
+                userId={userId}
+              />
+            ))
+          )}
         </List>
       )}
     </Box>
   );
 }
 
-export default Posts;
+export default PostListComponent;

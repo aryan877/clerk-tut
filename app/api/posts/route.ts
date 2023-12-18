@@ -13,13 +13,21 @@ export async function GET(request: Request) {
 
   // Get the user ID and organization ID from the authenticated session
   const { userId, orgId } = auth();
-  console.log(userId, orgId);
+  console.log("Authenticated User ID:", userId);
+  console.log("Authenticated Organization ID:", orgId);
 
   try {
-    // Fetch posts that belong to the specific organization and sort by creation date in descending order
-    const posts = await Post.find({ organizationId: orgId })
-      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
-      .exec();
+    const posts = orgId
+      ? await Post.find({ organizationId: orgId })
+          .sort({ createdAt: -1 })
+          .exec()
+      : userId
+      ? await Post.find({
+          $and: [{ organizationId: null }, { userId: userId }],
+        })
+          .sort({ createdAt: -1 })
+          .exec()
+      : [];
 
     // Fetch user information for each post
     const postsWithUserInfo = await Promise.all(
@@ -47,7 +55,6 @@ export async function GET(request: Request) {
   }
 }
 
-
 /**
  * Handle POST requests to /api
  * @param {Request} request - The incoming POST request
@@ -71,9 +78,9 @@ export async function POST(request: Request) {
     // Add organizationId, userId, and createdAt to the post data
     const postWithIdsAndDate = {
       ...postData,
-      organizationId: orgId,
+      organizationId: orgId || null,
       userId: userId,
-      createdAt: new Date(), // Add the current date
+      createdAt: new Date(),
     };
 
     console.log("Post Data with IDs and Date:", postWithIdsAndDate);

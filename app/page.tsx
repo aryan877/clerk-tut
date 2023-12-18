@@ -3,7 +3,8 @@ import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { AppShell, Box, Burger, Group, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Navbar from "@/components/Navbar";
-import Posts from "@/components/Posts";
+import PostListComponent from "@/components/PostList";
+
 
 export default function HomePage() {
   const [opened, { toggle }] = useDisclosure();
@@ -42,7 +43,7 @@ export default function HomePage() {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Posts/>
+        <PostListComponent/>
       </AppShell.Main>
     </AppShell>
   );

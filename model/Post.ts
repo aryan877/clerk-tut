@@ -16,7 +16,6 @@ const PostSchema: Schema<Post> = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "Please add a title"],
-    unique: true,
     trim: true,
     maxlength: [40, "Title cannot be more than 40 characters"],
   },
@@ -27,7 +26,6 @@ const PostSchema: Schema<Post> = new mongoose.Schema({
   },
   organizationId: {
     type: String,
-    required: true,
   },
   userId: {
     type: String,

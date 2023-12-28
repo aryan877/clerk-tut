@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.28.1",
+    "@clerk/nextjs": "4.29.1-canary.v3ece3f8",
     "@clerk/themes": "^1.7.9",
     "@mantine/core": "7.3.1",
     "@mantine/hooks": "7.3.1",
@@ -19,7 +19,8 @@
     "mongoose": "^8.0.3",
     "next": "14.0.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "svix": "^1.15.0"
   },
   "devDependencies": {
     "@types/node": "20.8.10",

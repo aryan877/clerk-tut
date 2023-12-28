@@ -51,7 +51,7 @@ function PostListComponent() {
   const handleDelete = async (postId: string) => {
     try {
       if (organization?.id) {
-        await axios.delete(`/api/delete_post?postid=${postId}`);
+        await axios.delete(`/api/posts?postid=${postId}`);
         const response = await axios.get("/api/posts");
         setPosts(response.data.data);
       }

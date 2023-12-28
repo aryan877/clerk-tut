@@ -19,7 +19,6 @@ export default authMiddleware({
   // Note: API routes, will require authentication
   apiRoutes: [
     "/api/posts", // Publicly accessible posts API
-    "/api/delete_post", // Publicly accessible delete post API
   ],
 });
 
